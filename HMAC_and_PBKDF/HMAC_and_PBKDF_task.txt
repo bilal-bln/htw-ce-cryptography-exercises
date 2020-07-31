@@ -1,0 +1,48 @@
+12_HMAC_and_PBKDF task (german):
+
+HMAC und PBKDF2 mit wolfCrypt
+
+MACs könen nicht nur zur Authentisierung von Nachrichten verwendet werden sondern auch dazu, aus Passworten kryptographische Schlüssel einer gewünschten Länge zu erzeugen.
+
+Menschliche Nutzer mögen keine langen und "kryptischen" Passworte aber Kryptoverfahren benötigen gute kryptographische Schlüssel einer bestimmten Länge.
+
+Beispiel: WLAN WPA2 Anmeldung mit einem Passwort (== pre shared Key == PSK). Das Passwort besteht vielleicht aus nur 4..8 "gängigen" ASCII Zeichen. Aus dem Passwort wird intern ein 256-bit (=32 Byte) langer PMK (pairwise master key) abgeleitet.
+
+Wie wird das gemacht (gemäß IEEE 802.11i)?
+
+    Zum Passwort (PSK) werden weitere Zeichen ("Salz") hinzugefügt, in diesem Fall der Name (ESSID) des WLAN. Beispiel: "FRITZ!Box Gastzugang". Das Salz muss nicht geheim sein, es verhindet aber, dass ein Angreifer eine vorberechnete Tabelle (z.B. eine Rainbow-Table) aus der Tasche zieht in der zu jedem kurzen Passwort der daraus abgeleitete PMK drinsteht.
+
+    aus dem gesalzenen Passwort wird mit einem MAC Algorithmus ein Hashwert berechnet, im Beispiel: HMAC
+    Mit wolfcrypt:
+
+    wc_HmacSetKey(&hmac, WC_SHA256, password, sizeof(password));
+    wc_HmacUpdate(&hmac, salt, sizeof(salt));
+    wc_HmacFinal(&hmac, hmacDigest);
+
+    Nun könnte der Angreifer ja erst den Namen des WLAN ausspähen, dann die Tabelle berechnen und dannach angeifen. Er kennt dann die meisten Zeichen des Geheimnisses (das Salz) und kann dies als Konstante in die Tabellenberechnung einfließen lassen. Um das zu erschweren, wird der HMAC nicht nur einmal berechnet sondern iterativ wie folgt (sinngemäße Darstellung, der Code ist etwas komplexer, siehe wolfCrypt Implementierung!):
+
+    hash = HMAC(psk,salt);
+    int iterations = 4096;
+    for( int i=0; i<iterations; ++i ) {
+      hash = HMAC(hash);
+    }
+
+    Da jede einzelne HMAC Berechnung nicht umkehrbar ist (Einwegfunktion) gibt es keine Abkürzungen zur iterativen Berechnung des Endresultates. Der Algorithmus wurde so absichtlich verlangsamt ("slow hashing"), damit ein Angreifer mehr Rechenleistung für eine Brute-Force Attacke benötigt und diese (hoffentlich) praktisch undurchführbar wird. Die Zahl der Iterationen sollte also möglichst groß sein. Allerdings darf die normale Authentifizierung die die Berechnung einer PBKDF erfordert nicht allzusehr ausgebremst werden. Und diese erfolgt im Beispiel eher auf einem vergleichsweise unperformanten Microcontroller im WLAN Access Point.
+
+Aufgabe
+
+Implementieren Sie das geschilderte Verfahren durch Aufruf einer einzigen wolfCrypt Funktion wc_PBKDF2 (Password-Based Key Derivation Function 2) mit den Parametern:
+
+    // HMAC auf Basis von SHA256           // <--- im Verfahren vorgeschriebener Hashing Algorithmus
+    byte psk[] = ...;                      // ihre Matrikelnummer als pre-shared key string, z.B.  = "123456";
+    byte ssid[] = "FRITZ!Box Gastzugang";  // fest vorgegebener ESSID
+    int iterations = 4096;                 // verfahrensbedingte Konstante
+    byte pmk[32];                          // Ergebnis
+
+Achten Sie daaruf, den richigen Parameter an der richtigen Stelle in der Aufrufparameterliste zu verwenden!
+
+Laden Sie den Quellcode und den berechneten PMK (als Hexastring) hoch. Ergebnis im Beispiel:
+
+f50d1ee1406df5f23ac6a07ed7ad484f842eeb40dbc5d8f4edcc7ace38143125
+
+Eine "Key Derivation Function" ist auch in anderen Fällen nützlich, z.B. wenn per DHKE ein gemeinsamer Schlüssel vereinbart wurde. Die Länge des von DHKE generierten Schlüssels ist durch das DHKE Verfahren bestimmt und passt evtl. nicht für die danach stattfindende symmetrische Verschlüsselung. Wenn der Input bereits ausreichend Entropie enthält, kann auf die vielen Iterationen sogar verzichtet werden.

@@ -1,0 +1,90 @@
+3_AES_ECB_and_CTR task (german):
+
+AES ECB und CTR Modi
+ECB Mode
+
+Lernen Sie nun eine Schwäche der wiedeholten Anwendung von AES im ECB Mode kennen. Im Anhang finden Sie die Bilddatei 3_AES_CTR_plain.bmp. das Bild ist 1024x768 Pixel groß, ein Pixel besteht aus 3 Werten (RGB). Am Anfang der Bilddatei steht ein 54 Byte langer Header. Die auf ein Vielfaches der AES_BLOCK_SIZE aufgerundete Größe der Datei sei MESSAGE_SIZE.
+
+Bilddaten sind gut geeignet um Verschlüsselung zu visualisieren, da Sie viele Daten auf einen Blick betrachten können.
+
+Packen Sie den folgenden Code in eine Funktion doAesEcb() die von main() aufgerufen wird.
+
+Verschlüsseln Sie diese Datei mit dem wc_Aes*Direct API wie bei der letzten Aufgabe wie folgt:
+
+Einlesen der Daten:
+
+    static uint8_t aes_plain[MESSAGE_SIZE];
+    FILE* f = fopen("3_AES_CTR_plain.bmp", "rb");
+    fread(aes_plain, 1, MESSAGE_SIZE, f);
+    fclose(f);
+
+Generieren Sie sich einen zufälligen eigenen AES Schlüssel mit Hilfe von
+
+    WC_RNG rng;
+    wc_InitRng(&rng);
+    byte aes_key[AES_128_KEY_SIZE];
+    wc_RNG_GenerateBlock(&rng, aes_key, sizeof aes_key);
+
+Achtung: wc_RNG_GenerateBlock erzeugt bei jedem Aufruf andere Werte. Rufen Sie die Fkt. nur einmal auf, notieren sich das Ergebnis und benutzen künftig dieses.
+
+Setzen Sie den Schlüssel mit
+
+wc_AesSetKeyDirect(&aes_enc, aes_key, sizeof aes_key, NULL, AES_ENCRYPTION);
+
+Die Verschlüsselung der Bilddaten erfolgt durch wiederholtes Anwenden derselben AES Verschlüsselung auf die einzelnen Datenblöcke:
+
+    static uint8_t aes_cipher[MESSAGE_SIZE];
+    for (int i = 0; i < MESSAGE_SIZE; i += AES_BLOCK_SIZE) {
+        wc_AesEncryptDirect(&aes_enc, aes_cipher + i, aes_plain + i);
+    }
+
+Der Bildheader darf nicht verschlüsselt werden, weil die Bilddatei sonst nicht anzeigt werden kann. Der Dateiheader der Originaldatei kann wiederverwendet werden weil sich am Bildformat nichts geändert hat. (Für Interessierte: https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-header-types).
+
+memcpy(aes_cipher, aes_plain, 54);
+
+Die Ausgabe der Bilddaten erfolgt analog zum Einlesen. Dateiname der Ausgabe: 3_AES_CTR_cipher_ECB.bmp.
+
+Betrachten Sie das verschlüsselte Bild. Was fällt Ihnen auf? Wie erklären Sie sich den beobachteten Effekt? Das AES ECB verschlüsselte Bild, den Quellcode und Ihre Antworten dazu bitte hochladen.
+CTR Mode
+
+Packen Sie den folgenden Code in eine Funktion doAesCtr() die von main() aufgerufen wird.
+
+Eine einfache Verbesserung bietet der CTR Mode. Hierbei wird die AES Verschlüsselung benutzt, um eine One-Time-Pad artige Folge von pseudo-zufälligen Bits zu erzeugen mit der die Bilddaten dann XOR verknüpft werden.
+
+Benutzen Sie denselben Schlüssel wie oben und einen Initialisierungsvektor. Im Initialisierungsvektor ersetzen Sie 123456 durch Ihre sechsstellige Matrikelnummer.
+
+    static uint64_t aes_enc_iv[2] = { 123456, 0 };
+    wc_AesSetKeyDirect(&aes_enc, aes_key, sizeof aes_key, NULL, AES_ENCRYPTION);
+
+Der Initialisierungsvektor dient als AES Input. Er wird für jeden Block modifiziert, indem die zweite Komponente aes_enc_iv[1] nach jeder Verschlüsselung eines Blockes um 1 erhöht wird (Block Counter). Der erste Teil aes_enc_iv[0] übernimmt die rolle der nonce und müsste (um eine qualitativ hochwertige Verschlüsselung zu erzielen) ein einmaliger Wert sein, den Sie nie wiederverwenden dürfen. Wir machen hier eine Ausnahme, damit ich die Ergebnisse kontrollieren kann :-).
+
+Die Verschlüsselung der gesamten Daten:
+
+    for (int i = 0; i < MESSAGE_SIZE; i += AES_BLOCK_SIZE) {
+        
+        static uint8_t aes_xor[AES_BLOCK_SIZE];
+        wc_AesEncryptDirect( &aes_enc, aes_xor, (byte*)aes_enc_iv );
+
+        for (int j = 0; j < AES_BLOCK_SIZE; ++j) {
+            aes_cipher[i + j] = aes_plain[i + j] ^ aes_xor[j];
+        }
+        
+        aes_enc_iv[1]++;
+    }
+
+Der Rest (Eingabe, Ausgabe, memcpy für den Bildheader) bleibt wie oben beschrieben.Der Dateiname für die Ausgabe lautet diesmal 3_AES_CTR_cipher_CTR.bmp.
+
+Anmerkung: die Verwendung von nonce und counter entspricht nicht ganz dem Standard. Im Standard wird von einer Big Endian Anordnung der Bytes ausgegangen, was meist (x86, x64, ARM) nicht gegeben ist. Das wc_AesCtrEncrypt API wäre standardkonform, darf in dieser Aufgabe aber nicht verwendet werden.
+
+Betrachten Sie die AES CTR verschlüsselte Bilddatei. Was stellen Sie im Unterschied zum ECB Mode fest?
+
+Angenommen, Sie würden eine zweite, mir unbekannte, Bilddatei 3_AES_CTR_plain_2.bmp in demselben Bildformat verschlüsseln (Dateiname 3_AES_CTR_cipher_CTR_2.bmp) und dabei denselben Schlüssel verwenden und mit demselben Initialisierungsvektor beginnen. Ich kenne also 3_AES_CTR_plain.bmp, 3_AES_CTR_cipher_CTR.bmp sowie 3_AES_CTR_cipher_CTR_2.bmp.
+
+Könnte ich daraus 3_AES_CTR_plain_2.bmp ermitteln und wenn ja, wie?
+
+Könnte ich daraus den von Ihnen generierten Schlüssel ermitteln und wenn ja, wie?
+
+Begründen sie kurz, laden Sie den Quelltext und Ihre Antworten hoch.
+ 
+	
+3_AES_CTR_plain.bmp 3_AES_CTR_plain.bmp 

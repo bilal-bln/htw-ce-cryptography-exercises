@@ -1,0 +1,28 @@
+1_RABBIT task (german):
+
+1_RABBIT
+
+Ein kurzer Text wurde mit dem Streamchiffre RABBIT verschlüsselt (#include <wolfssl/wolfcrypt/rabbit.h>).
+
+Sie wissen, dass die Verschlüsselung nicht sehr professionell durchgeführt wurde. RABBIT benutzt zwar einen 16-Byte Schlüssel, aber der wurde als eine static Variable definiert, ähnlich der folgenden Zeile
+
+static byte key[16] = "1234";
+
+Der Wert "1234" ist hier nur als Platzhalter eingesetzt. Sie wissen aber, dass eine 4-stellige numerische Pin (Zifffern '0'-'9') verwendet wurde, ggf. mit führenden Nullen. Wegen der static Definition sind die hinteren 12 Bytes sämtlich 0.
+
+Sie wissen auch, dass kein Initialisierungsvektor benutzt wurde (iv==NULL).
+
+Sie vermuten weiterhin, das der Klartext nur aus Zahlen und Buchstaben (C Funktion isalpha) und Leerzeichen besteht.
+
+Eines Tages fangen Sie die verschlüsselte Nachricht "HfDr2ZhjsPtqCg8BdmQCQOaSNo7E3+Y="  ab. Sie erkennen sofort, dass die verschlüsselte Nachricht für den Transport im Base64 Format kodiert wurde, damit sie nur aus sicher übertragbaren ASCII Zeichen besteht. Sie wandeln diese daher zurück:
+
+byte secret_base64[34] = "HfDr2ZhjsPtqCg8BdmQCQOaSNo7E3+Y=";
+byte secret[25];
+int secretlen = sizeof(secret);
+Base64_Decode(secret_base64, sizeof(secret_base64), secret, &secretlen );
+
+Nun müssen Sie nur noch die mit RABBIT verschlüsselte Nachricht secret entschlüsseln. Sie entscheiden sich aufgrund der Ihnen bekannt gewordenen Randbedingungen (siehe oben) dafür, eine Brute-Force Attacke durchzuführen.
+
+Frage: Wie lautet die Nachricht im Klartext?
+
+Laden Sie zusätzlich den Quellcode zu Ihrer Lösung hoch (eine .c Datei).

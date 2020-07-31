@@ -1,0 +1,27 @@
+DHKE task (german):
+
+Diffie-Hellman Key Exchange (DHKE)
+
+Stellen Sie sich vor, dass zwischen Ihnen (Alice) und mir (Bob) ein DHKE stattfindet.
+
+Dazu haben wir uns eine 'große' Primzahl p gesucht mit
+
+int p = find_next_prime(30003);
+
+und eine primitive Wurzel g von p wie folgt bestimmt:
+
+int g = find_primitive_root(p);
+
+Alle Funktionen sind aus der "Mini Kryptographie mit C".
+
+Mit p und g habe ich aus meinem Geheimnis a den Wert A=1103 berechnet und Ihnen zugesandt.
+
+Sie nehmen Ihre 6-stellige Matrikelnummer als 'Geheimnis' b und berechen daraus B.
+
+Abgabe: Wie lautet der von Ihnen berechnete Wert B?
+
+Abgabe: Wie lautet unser gemeinsames Geheimnis (Schlüssel)?
+
+Bonus: Wie lautet mein Geheimnis a?
+
+Abgabe C-Code zur Berechnung aller Lösungen.

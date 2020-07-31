@@ -1,0 +1,104 @@
+RSA 512 bit key generation in 100 loop cycles took
+in average: 0.022694 seconds
+in total:   2.269354 seconds
+minimum:    0.008085 seconds
+maximum:    0.069453 seconds
+
+
+RSA 768 bit key generation in 100 loop cycles took
+in average: 0.021222 seconds
+in total:   2.122191 seconds
+minimum:    0.007340 seconds
+maximum:    0.054963 seconds
+
+
+RSA 1024 bit key generation in 100 loop cycles took
+in average: 0.023861 seconds
+in total:   2.386057 seconds
+minimum:    0.007336 seconds
+maximum:    0.058167 seconds
+
+
+RSA 1280 bit key generation in 100 loop cycles took
+in average: 0.024080 seconds
+in total:   2.407979 seconds
+minimum:    0.009113 seconds
+maximum:    0.061920 seconds
+
+
+RSA 1536 bit key generation in 100 loop cycles took
+in average: 0.022542 seconds
+in total:   2.254236 seconds
+minimum:    0.007125 seconds
+maximum:    0.068061 seconds
+
+
+RSA 1792 bit key generation in 100 loop cycles took
+in average: 0.022456 seconds
+in total:   2.245577 seconds
+minimum:    0.008374 seconds
+maximum:    0.059223 seconds
+
+
+RSA 2048 bit key generation in 100 loop cycles took
+in average: 0.021341 seconds
+in total:   2.134106 seconds
+minimum:    0.009147 seconds
+maximum:    0.056611 seconds
+
+
+RSA 2304 bit key generation in 100 loop cycles took
+in average: 0.021713 seconds
+in total:   2.171322 seconds
+minimum:    0.007109 seconds
+maximum:    0.056489 seconds
+
+
+RSA 2560 bit key generation in 100 loop cycles took
+in average: 0.022535 seconds
+in total:   2.253458 seconds
+minimum:    0.008146 seconds
+maximum:    0.057159 seconds
+
+
+RSA 2816 bit key generation in 100 loop cycles took
+in average: 0.022671 seconds
+in total:   2.267053 seconds
+minimum:    0.007996 seconds
+maximum:    0.059970 seconds
+
+
+RSA 3072 bit key generation in 100 loop cycles took
+in average: 0.021648 seconds
+in total:   2.164759 seconds
+minimum:    0.008238 seconds
+maximum:    0.056358 seconds
+
+
+RSA 3328 bit key generation in 100 loop cycles took
+in average: 0.020032 seconds
+in total:   2.003192 seconds
+minimum:    0.007683 seconds
+maximum:    0.074601 seconds
+
+
+RSA 3584 bit key generation in 100 loop cycles took
+in average: 0.022526 seconds
+in total:   2.252559 seconds
+minimum:    0.008753 seconds
+maximum:    0.082600 seconds
+
+
+RSA 3840 bit key generation in 100 loop cycles took
+in average: 0.022113 seconds
+in total:   2.211309 seconds
+minimum:    0.007532 seconds
+maximum:    0.061444 seconds
+
+
+RSA 4096 bit key generation in 100 loop cycles took
+in average: 0.021848 seconds
+in total:   2.184765 seconds
+minimum:    0.008365 seconds
+maximum:    0.061649 seconds
+

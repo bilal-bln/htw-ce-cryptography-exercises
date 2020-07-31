@@ -1,0 +1,157 @@
+0_Hello_wolfcrypt task (german);
+
+0_Hello_wolfcrypt
+Ziel
+
+Arbeitsfähigkeit herstellen.
+Benötigte Software
+Krypto Bibliothek: wolfCrypt
+
+Die Bibliothek ist ein Bestandteil von wolfssl ("Embedded TLS Library for Applications, Devices, IoT, and the Cloud - Providing secure communication for IoT, smart grid, connected home, automobiles, routers, applications, games, IP, mobile phones, the cloud, and more."). Wir nutzen die GPL Lizenz dieser Open-Source Software.
+
+Dokumentation online: https://www.wolfssl.com/doxygen/wolfcrypt_API.html
+
+Die Bibliothek wird aus den Quellen gebaut:
+
+Clonen Sie die Quellen aus dem github Repository in ein neues leeres Verzeichnis:
+
+git clone  https://github.com/wolfSSL/wolfssl.git
+cd wolfssl/
+
+Tipp: Unter Windows empfehle ich gitbash die von https://git-scm.com/download/win heruntergeladen werden kann.
+
+Das Verzeichnis in dem Sie jetzt sind, ist das Wurzelverzeichnis von wolfssl.
+
+Zum Vergleich: Die von mir genutzte HEAD Revision im master branch war commit 26f539400.
+IDE
+
+Empfohlen wird das kostenlose Microsoft Visual Studio 2019 Community Edition, ich bevorzuge englische Spracheinstellungen.
+
+Sie können auch eine andere IDE verwenden, die Sie beim Browsen durch die Bibliothek und beim Debugging unterstützt.
+
+Die wolfcrypt Bibliothek läßt sich auch auf vielen anderen Systemen bauen, die ich aber nicht alle supporten kann.
+
+Der selbstgeschriebene Code muss C11 konform sein.
+wolfcrypt bauen (Windows)
+
+Zum Bauen öffnen Sie die Visual Studio Solution wolfssl.sln. Beim ersten Mal werden Sie nach einer Konvertierung in das Visual Studio 2019 Format gefragt, stimmen Sie zu und bauen Sie die Bibliothek in der Konfiguration Debug/x86.
+
+Im Ergebnis bekommen Sie:
+
+alle Header Dateien für den Compiler in den Unterverzeichnis wolfssl und wolfssl\wolfcrypt.
+die Bibliothek für den Linker im Unterverzeichnis Debug.
+
+Bewegen Sie die Dateien einschließlich aller Quellen nicht in ein anderes Verzeichnis, da sonst beim Debuggen die Quellen nicht mehr automatisch geladen werden können.
+
+
+
+Nachdem das erste Bauen erfolgreich beendet wurde, ändern Sie die Konfigurationsdatei IDE\WIN\user_settings.h indem Sie ab Zeile 9 ein paar defines setzen:
+
+#define HAVE_ONE_TIME_AUTH
+#define HAVE_ECC
+#define HAVE_CHACHA
+#define HAVE_POLY1305
+#define WOLFSSL_KEY_GEN
+
+Die Liste der Defines wird im Laufe der Zeit noch weiter angepasst.
+
+Bauen Sie die Bibliothek erneut.
+
+Schließen Sie Visual Studio 2019.
+
+Allgemeine Docs zum Bauen: https://www.wolfssl.com/docs/wolfssl-manual/ch2/
+wolfcrypt (wolfssl) bauen (Ubuntu)
+
+siehe auch online docs
+
+git clone https://github.com/wolfSSL/wolfssl.git
+cd wolfssl
+./autogen.sh
+./configure
+make
+sudo make install
+
+Projekt: 0_Hello_wolfcrypt
+
+Visual Studio 2019 öffnen.
+
+Create new project Console App Name: 0_Hello_wolfcrypt
+
+Source Datei umbenennen in 0_Hello_wolfcrypt.c (nicht .cpp).
+
+Schreiben Sie ein kurzes "Hello World!" Programm zunächst ohne wolfcrypt und testen Sie dieses.
+
+Die Projektkonfiguration sollte Debug/x86 sein.
+
+
+
+Für die Einbindung von wolfcrypt benötigen Sie
+
+den absoluten Pfad zu den include Dateien == Wurzelverzeichnis
+den Pfad zu der statischen Bibliothek == Wurzelverzeichnis\Debug
+
+
+
+In Ihrem 0_Hello_wolfcrypt Projekt unter
+
+Project > Properties > C++ > General > Additional Include Directories
+
+fügen Sie den include Pfad ein, unter
+
+Project > Properties > Linker > General > Additional Library Directories
+
+fügen Sie den kompletten Bibliothek Pfad ein, unter
+
+Project > Properties > Linker > Input > Additional Dependencies
+
+fügen Sie, durch Komma getrennt, zwei Bibliotheken ein: wolfssl.lib und ws2_32.lib.
+
+ws2_32.lib ist die Windows Socket Bibliothek, die hier nur am Rande benötigt wird.
+
+Erweitern Sie 0_Hello_wolfcrypt.c wie folgt:
+
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+
+#include <wolfssl/wolfcrypt/sha256.h>
+
+int main()
+{
+printf("Hello World!\n");
+
+if (wolfCrypt_Init() != 0) {
+    printf("Error with wolfCrypt_Init call");
+    return -1;
+}
+
+byte hash[WC_SHA256_DIGEST_SIZE];
+
+wc_Sha256 sha256;
+
+wc_InitSha256(&sha256);
+wc_Sha256Update(&sha256, "123456", 6 );
+wc_Sha256Final(&sha256, hash);
+
+for (int i = 0; i < sizeof(hash); ++i) {
+    printf("%02x", hash[i]);
+}
+
+return 0;
+}
+
+Sie sollten das Projekt nun fehlerfrei bauen können.
+
+Wenn Sie schrittweise durch das Programm steppen (F11), steppen Sie auch durch den Code der Bibliothek.
+
+Tipp: Visual Studio Keyboard Shortcuts Debugging.
+
+SHA-256 ist ein hashing Algorthmus, mehr dazu später. Er berechnet eine kryptographische Checksumme Ihrer Eingabe ("123456").
+
+Die Ausgabe sollte 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92 sein.
+0_Hello_wolfcrypt unter Ubuntu bauen
+
+Wie oben, aber nehmen Sie z.B. vi 0_Hello_wolfcrypt.c statt Visual Studio :-) Dann:
+
+gcc 0_Hello_wolfcrypt.c -o 0_Hello_wolfcrypt -lwolfssl
+LD_LIBRARY_PATH=/usr/local/lib ./0_Hello_wolfcrypt

@@ -1,0 +1,57 @@
+4_rsa task (german):
+
+Mini Kryptographie mit C
+Den Code zum Laufen bringen
+
+Der beiliegende Quelltext rsa.cpp demonstriert RSA Kryptographie mit kleinen Zahlen. Es werden Standard C/C++ Typen benutzt, wodurch die Funktionen leicht lesbar und nachvollziehbar werden. Nachteil: der darstellbare Zahlenbereich ohne Überlauf ist für ernsthafte Kryptographieanwendungen viel zu klein. Ausserdem werden einfache Implementierungen ohne kryptographische Rafinessen und Sicherheitsmaßnahmen verwendet. Aber: es funktioniert für kleine Beispiele!
+
+Bauen Sie den Code in einer Umgebung Ihrer Wahl und prüfen Sie, dass das eingebaute Testbeispiel korrekt abgearbeitet wird.Referenzplatform: Visual Studio 2019 x86.
+Eine Nachricht entschlüsseln
+
+Entschlüsseln Sie mit Hilfe des Codes die RSA verschlüsselte Nachricht c=673379914. Benutzen Sie dazu den privaten Schlüssel d=48190717 und N=963876449.
+
+Wie lautet das Ergebnis? Nennen Sie es in Ihrer Abgabe.
+Laufzeitkomplexität analysieren
+
+Sie sollen nun für jede einzelne Funktion (ausser main) entscheiden, ob die angegebene Implementierung effizient ist oder nicht.
+
+Effizient soll heissen, dass Sie im Kontext von RSA keine bessere Implementierung finden, deren Worst-Case Laufzeit in groß-Oh-Notation (=Laufzeitkomplexität) kleiner ist.
+
+Hinweise:
+
+    Sie können alle Hilfsmittel (wolfcrypt, Krypto Buch, Internet) benutzen um nach effizienteren Implementierungen im Kontext von RSA zu suchen, Sie sollen keine neuen Implementierungen erfinden.
+    Die Funktion main, die das RSA Verfahren implementiert, nehmen Sie als so gegeben hin, die soll nicht untersucht oder verändert werden. Sie bestimmt den Ablauf des Verfahrens.
+    Es geht nicht darum ob eine for- oder eine while-Schleife effizienter wäre oder ob man statt + 1 besser ++ geschrieben hätte. Sondern es geht darum, ob z.B. für die Funktion is_prime im Kontext von RSA effizientete Verfahren eingesetzt werden als das im Code beigelegte oder nicht.
+    Die Bezugsgröße N zur Messung der Laufzeitkomplexität ist die Länge aller Eingabeparameter. Die Länge einer Zahl x ist die Anzahl ihrer Stellen im Binärsystem, also die Anzahl der Bits log(x). Die Basis 2 des Logarithmus kann weggelassen werden weil alle Basen zu derselben Komplexitätsklasse führen. Bei mehreren Parametern genügt die Länge der größten Zahl (die alle anderen Längen dominiert).
+
+Erstellen Sie in Ihrer Abgabe für jede Funktion in der Reihenfolge ihrer Definition im Code einen kleine Absatz mit dem Funktionsnamen als Überschrift und Ihren Analyseergebnissen im Text. Es genügen aussagekräftige Stichpunkte zu den gefundenen Alternativen mit Quellenangaben oder eigenen Begründungen. Nur "ja" oder "nein" wäre zu wenig. Wenn möglich, benennen Sie die recherchierte oder ermittelte Laufzeitkomplexität (linear, quadratisch, polynomiell, exponentiell, ...).
+Big Integer
+
+Echte RSA Implementierungen benutzen eine "Big Integer" oder "Multi Precision Integer" Klasse die alle elementaren Operationen für beliebig große Ganzzahlen implementiert. Hier wäre C++ wegen der möglichen Operatorüberladung im Vorteil. Studieren Sie die Verwendung von mp_int in wolfCrypt an, indem Sie ein kleines Prog. schreiben:
+
+    wolfCrypt_Init
+    wc_InitRng
+    wc_MakeRsaKey mit dem in der API Doc genannten Wert für e und der Schlüssellänge RSA_MIN_SIZE.
+
+Geben Sie alle erzeugten RSA Parameter aus, so wie beispielsweise hier die Primzahl p:
+
+    uint32_t bufferLen = sizeof buffer;
+    wc_export_int( &privKey.p, buffer, &bufferLen, RSA_KEY_SIZE, WC_TYPE_HEX_STR );
+    printf("p = 0x%s\n", buffer);
+
+Laden Sie in Ihrer Abgabe aller erzeugten RSA Parameter mit ihren Werten hoch, z.B:
+
+p = ...
+q = ...
+n = ...
+e = ...
+d = ...
+
+Bonus (25 Punkte): Laufzeit in Abhängigkeit von der Schlüssellänge
+
+Messen Sie die Laufzeit von wc_MakeRsaKey für verschiedene Schlüssellängen RSA_MIN_SIZE .. RSA_MAX_SIZE in Schritten von 256.
+
+Führen Sie für jede Schlüssellänge mindestens 10 Durchläufe durch und ermitteln Sie den Mittelwert und min/max Werte. Stellen Sie die Ergebnisse in einem Digram graphisch dar und laden Sie das ("ausgedruckte") Diagram im .pdf Format hoch.
+ 
+	
+rsa.cpp rsa.cpp 

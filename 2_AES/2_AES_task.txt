@@ -1,0 +1,36 @@
+2_AES task (german):
+
+2_AES
+
+Ziel dieser Aufgabe ist es, die AES Verschlüsselung zu benutzen und zu benchmarken.
+
+Dazu müssen die wolfcrypt Funktionen wc_AesSetKeyDirect, wc_AesEncryptDirect, und wc_AesSetKeyDirect benutzt werden:
+
+#define WOLFSSL_AES_DIRECT
+#include <wolfssl/wolfcrypt/aes.h>
+
+Beachten Sie, dass es zwei getrennte AES Instanzen geben muss: eine zum Verschlüsseln und eine zum Entschlüsseln (Verifikation). Falls die "Direct" Funktionen nicht gefunden werden, müssen Sie die wolfcrypt Bibliothek erneut bauen und dabei ebenfalls #define WOLFSSL_AES_DIRECT setzen, siehe Aufgabe 0.
+
+Es muss die 128-Bit Variante benutzt werden, passen Sie die Keylänge entsprechend an.
+
+Die wolfcrypt Bibliothek sollte defaultmäßig bereits so eingestellt sein, dass die Software AES Implementierung benutzt wird. Prüfen sie das, indem Sie beim Debuggen in die AES Funktionen hinein"steppen".
+
+Die korrekte AES Ver- und Entschlüsselung soll nun mit einen Testbeispiel überprüft werden. Suchen Sie dazu auf den https://nist.gov Internetseiten nach dem "NIST FIPS 197" AES Standard .pdf Dokument und dort nach "Appendix B – Cipher Example". Benutzen Sie den dort beschriebenen Testvektor (Input + Key). Tipp: in wc_AesSetKeyDirect für den iv den Wert NULL angeben, ein iv wird hier nicht benutzt. Führen Sie eine AES Verschlüsselung durch und prüfen Sie, ob ihr Ergebnis mit der Vorgabe übereinstimmt. Prüfen Sie anschließend, ob die Entschlüsselung den Klartext wiederherstellen kann.
+
+Messen Sie nun die Laufzeit der Verschlüsselung indem Sie in einer for Schleife wiederholt dieselbe Verschlüsselung durchführen. Bemessen Sie die Anzahl der Schleifendurchläufe so, dass der Durchlauf mehrere Sekunden dauert. Messen Sie die Laufzeit der Schleife mit Hilfe der clock() Funktion und ermitteln Sie daraus die Laufzeit für eine AES Verschlüsselung.
+
+Wiederholen Sie die Messung für die Entschlüsselung. Laden Sie beide Ergebnisse zusammen mit ihrem Quellcode (eine .c Datei) hoch. Geben Sie dazu an, auf welchem Prozessor sie getestet haben, z.B. "Pentium Dual Core CPU T4500 2x 2,3 GHz". (Windows: dxdiag, Linux: lscpu).
+
+Ermitteln Sie aus den Laufzeiten den Datendurchsatz in MB/s und laden Sie die Ergebnisse sowie die Quelldatei *.c) hoch.
+
+Was vermuten Sie, wird die Laufzeit von der konkreten Wahl der Daten (Input, Key) abhängen oder eher nicht? Was wären von Vor-/Nachteil im Hinblick auf eine Kryptoanalyse? Formulieren Sie eine kurze Antwort und laden Sie sie hoch.
+
+Bonus (25 Extrapunkte): Sie finden einen Code Schnipsel der die AES Hardwarebefehle des Pozessors nutzt hier: https://gist.github.com/acapola/d5b940da024080dfaf5f. Wiederholen Sie die Zeitmessungen für AES unter Benutzung der AES-NI Befehle. Berechnen Sie den Datendurchsatz und den Performancegewinn der HW Lösung gegenüber der SW Implementierung in Prozent und laden Sie Ihre Ergebnisse ebenfalls hoch.
+
+Q&A:
+
+In der for-Schleife zur Laufzeitmessung soll nur wc_AesEncryptDirect aufgerufen werden. Der Schlüssel muss nur einmalig intialisiert werden, solange man ihn nicht ändern möchte.
+
+Für die Berechnung der Zeitmessung müssen die richtigen Datentypen (float?) benutzt werden, damit nicht 0 rauskommt.
+
+Tipp zur Berechnung des Datendurchsatzes: die Maßeinheit ist MB/s.
